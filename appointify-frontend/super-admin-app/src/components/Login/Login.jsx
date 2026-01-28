@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const [step, setStep] = useState(1);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const router = useNavigate();
 
+  // Step 1: Just move to OTP screen
   const handleSendOtp = (e) => {
     e.preventDefault();
     if (phone.length === 10) {
@@ -14,12 +18,34 @@ const Login = () => {
     }
   };
 
-  const handleVerifyOtp = (e) => {
+  // Step 2: Login API call
+  const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    console.log("Phone:", phone);
-    console.log("OTP:", otp);
-    alert("Login Successful");
-    router("/home");
+
+    try {
+      setLoading(true);
+
+      const res = await axios.post("http://localhost:3000/api/auth/login", {
+        phoneNumber: phone,
+        otp: otp,
+        role: "SUPER_ADMIN",
+      });
+      console.log(res);
+
+      console.log("Login Success:", res.data);
+
+      // store token & user
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      alert("Login Successful");
+
+      router("/home");
+    } catch (error) {
+      alert(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,9 +107,10 @@ const Login = () => {
 
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-[#540863] hover:bg-[#390644] text-white font-medium py-2.5 rounded-lg transition"
             >
-              Verify & Login
+              {loading ? "Logging in..." : "Verify & Login"}
             </button>
 
             <p className="text-sm text-center text-gray-500">
