@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, PencilLine, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
-const ListOfServiceProviders = () => {
-  const [providers, setProviders] = useState([]);
+const ListOfAdmin = () => {
+  const [admins, setAdmins] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [loading, setLoading] = useState(true);
@@ -21,46 +21,77 @@ const ListOfServiceProviders = () => {
     "Gym",
   ];
 
-  const fetchProviders = async () => {
+  const fetchAdmins = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:3000/api/serviceProvider/getAllProviders",
+        "http://localhost:3000/api/serviceProviderAdmin/getAllAdmins",
       );
-
-      setProviders(res.data.data || []);
+      console.log(res.data);
+      setAdmins(res.data.data || []);
     } catch (error) {
       console.error(error);
-      alert("Failed to fetch service providers");
-      setProviders([]);
+      alert("Failed to fetch service admins");
+      setAdmins([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProviders();
+    fetchAdmins();
   }, []);
 
-  const filteredProviders = providers.filter((p) => {
+  const filteredProviders = admins.filter((p) => {
     const matchSearch =
-      p.providerName?.toLowerCase().includes(search.toLowerCase()) ||
-      p.city?.toLowerCase().includes(search.toLowerCase());
+      p.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+      p.provider.providerName?.toLowerCase().includes(search.toLowerCase());
 
-    const matchCategory = category === "All" || p.category === category;
+    const matchCategory =
+      category === "All" || p.provider.category === category;
 
     return matchSearch && matchCategory;
   });
 
+  // const handleDelete = async (id) => {
+  //   const confirmDelete = window.confirm(
+  //     "Are you sure you want to delete this admin?",
+  //   );
+
+  //   if (!confirmDelete) return;
+
+  //   try {
+  //     await axios.delete(
+  //       `http://localhost:3000/api/serviceProviderAdmin/removeAdmin/${id}`,
+  //     );
+
+  //     // UI se turant remove
+  //     setAdmins((prev) => prev.filter((a) => a._id !== id));
+
+  //     alert("Admin deleted successfully ✅");
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("Failed to delete admin");
+  //   }
+  // };
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Service Providers
-        </h1>
-        <p className="text-sm text-gray-500">
-          Manage all registered service providers
-        </p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-800">Admin</h1>
+          <p className="text-sm text-gray-500">
+            Manage all registered service providers Admins
+          </p>
+        </div>
+        <div>
+          <Link
+            to={"/add-admin"}
+            className="px-8 py-3 bg-[#540863] text-white font-semibold rounded-lg shadow hover:bg-[#390644] transition"
+          >
+            Add Admin
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
@@ -91,10 +122,10 @@ const ListOfServiceProviders = () => {
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50 text-gray-600">
             <tr>
-              <th className="px-6 py-4 text-left">Provider Name</th>
+              <th className="px-6 py-4 text-left">Admin Name</th>
+              <th className="px-6 py-4 text-left">Service Provider</th>
               <th className="px-6 py-4 text-left">Category</th>
               <th className="px-6 py-4 text-left">Phone</th>
-              <th className="px-6 py-4 text-left">City</th>
               <th className="px-6 py-4 text-left">Status</th>
               <th className="px-6 py-4 text-left">Actions</th>
             </tr>
@@ -114,11 +145,11 @@ const ListOfServiceProviders = () => {
                   className="border-t hover:bg-gray-50 transition"
                 >
                   <td className="px-6 py-4 font-medium text-gray-800">
-                    {p.providerName}
+                    {p.fullName}
                   </td>
-                  <td className="px-6 py-4">{p.category}</td>
-                  <td className="px-6 py-4">{p.phoneNumber}</td>
-                  <td className="px-6 py-4">{p.city}</td>
+                  <td className="px-6 py-4">{p.provider.providerName}</td>
+                  <td className="px-6 py-4">{p.provider.category}</td>
+                  <td className="px-6 py-4">{p.contactNumber}</td>
                   <td className="px-6 py-4">
                     <StatusBadge status="Active" />
                   </td>
@@ -128,7 +159,7 @@ const ListOfServiceProviders = () => {
                         <PencilLine className="w-4 h-4 " />
                       </div>
                       <div
-                        onClick={() => navigate(`/providers/view/${p._id}`)}
+                        onClick={() => navigate(`/admin/view/${p._id}`)}
                         className="rounded-full bg-red-100 p-1.5 cursor-pointer hover:bg-red-200 transition"
                       >
                         <Eye className="w-4 h-4 " />
@@ -140,7 +171,7 @@ const ListOfServiceProviders = () => {
             ) : (
               <tr>
                 <td colSpan="5" className="text-center py-6 text-gray-500">
-                  No service providers found
+                  No admins found
                 </td>
               </tr>
             )}
@@ -164,4 +195,4 @@ const StatusBadge = ({ status }) => (
   </span>
 );
 
-export default ListOfServiceProviders;
+export default ListOfAdmin;

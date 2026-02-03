@@ -92,3 +92,38 @@ export const getServiceProviders = async (req, res) => {
     });
   }
 };
+
+export const getServiceProviderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Provider ID is required",
+      });
+    }
+
+    const provider = await ServiceProviderModel.findById(id);
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        message: "Service provider not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Service provider fetched successfully",
+      data: provider,
+    });
+  } catch (error) {
+    console.error("getServiceProviderById error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};

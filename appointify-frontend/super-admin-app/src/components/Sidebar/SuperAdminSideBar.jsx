@@ -35,9 +35,12 @@ const SuperAdminSideBar = () => {
           <span className="text-sm">Provider Registration</span>
         </Link>
 
-        <Link className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition">
+        <Link
+          to={"/admin"}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition"
+        >
           <CalendarCheck size={18} />
-          <span className="text-sm"> Add Admin</span>
+          <span className="text-sm">Admin</span>
         </Link>
 
         <button

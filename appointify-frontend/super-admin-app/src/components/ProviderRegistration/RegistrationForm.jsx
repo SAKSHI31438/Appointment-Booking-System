@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const RegistrationForm = () => {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const router = useNavigate();
-
+  const { id } = useParams();
+  const isViewMode = Boolean(id);
+  const location = useLocation();
   const [formData, setFormData] = useState({
     providerName: "",
     category: "",
@@ -23,6 +25,16 @@ const RegistrationForm = () => {
     closingTime: "",
   });
 
+  useEffect(() => {
+    if (
+      location.pathname === "/register" &&
+      !sessionStorage.getItem("registerReloaded")
+    ) {
+      sessionStorage.setItem("registerReloaded", "true");
+      window.location.reload();
+    }
+  }, [location.pathname]);
+
   const toggleDay = (day) => {
     setFormData((prev) => ({
       ...prev,
@@ -39,6 +51,7 @@ const RegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isViewMode) return;
 
     try {
       const res = await axios.post(
@@ -63,13 +76,33 @@ const RegistrationForm = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchProviderDetails = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/api/serviceProvider/getProviderById/${id}`,
+        );
+        setFormData(res.data.data);
+      } catch (error) {
+        alert("Failed to load provider details");
+        console.error(error);
+      }
+    };
+
+    if (isViewMode) {
+      fetchProviderDetails();
+    }
+  }, [id, isViewMode]);
+
   return (
     <div className="min-h-screen px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="px-8 py-6 border-b border-gray-200">
           <h1 className="text-2xl font-semibold text-gray-800">
-            Service Provider Registration
+            {isViewMode
+              ? "View Service Provider"
+              : "Service Provider Registration"}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Add and manage service providers
@@ -83,6 +116,7 @@ const RegistrationForm = () => {
               <Input
                 label="Provider Name"
                 name="providerName"
+                disabled={isViewMode}
                 value={formData.providerName}
                 onChange={handleChange}
               />
@@ -91,6 +125,7 @@ const RegistrationForm = () => {
                 label="Category"
                 name="category"
                 value={formData.category}
+                disabled={isViewMode}
                 onChange={handleChange}
                 options={[
                   "Hospital",
@@ -106,6 +141,7 @@ const RegistrationForm = () => {
             <Input
               label="Short Description"
               name="shortDescription"
+              disabled={isViewMode}
               value={formData.shortDescription}
               onChange={handleChange}
             />
@@ -113,6 +149,7 @@ const RegistrationForm = () => {
             <Textarea
               label="Full Description"
               name="fullDescription"
+              disabled={isViewMode}
               value={formData.fullDescription}
               onChange={handleChange}
             />
@@ -125,18 +162,21 @@ const RegistrationForm = () => {
                 label="Phone Number"
                 name="phoneNumber"
                 value={formData.phoneNumber}
+                disabled={isViewMode}
                 onChange={handleChange}
               />
               <Input
                 label="Email"
                 name="email"
                 value={formData.email}
+                disabled={isViewMode}
                 onChange={handleChange}
               />
               <Input
                 label="Website"
                 name="website"
                 value={formData.website}
+                disabled={isViewMode}
                 onChange={handleChange}
               />
             </div>
@@ -148,6 +188,7 @@ const RegistrationForm = () => {
               label="Address Line"
               name="address"
               value={formData.address}
+              disabled={isViewMode}
               onChange={handleChange}
             />
 
@@ -156,12 +197,14 @@ const RegistrationForm = () => {
                 label="City"
                 name="city"
                 value={formData.city}
+                disabled={isViewMode}
                 onChange={handleChange}
               />
               <Input
                 label="State"
                 name="state"
                 value={formData.state}
+                disabled={isViewMode}
                 onChange={handleChange}
               />
               <Input
@@ -169,6 +212,7 @@ const RegistrationForm = () => {
                 name="pincode"
                 type="Number"
                 value={formData.pincode}
+                disabled={isViewMode}
                 onChange={handleChange}
               />
             </div>
@@ -182,6 +226,7 @@ const RegistrationForm = () => {
                 <button
                   key={day}
                   type="button"
+                  disabled={isViewMode}
                   onClick={() => toggleDay(day)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all
                     ${
@@ -201,6 +246,7 @@ const RegistrationForm = () => {
                 type="time"
                 name="openingTime"
                 value={formData.openingTime}
+                disabled={isViewMode}
                 onChange={handleChange}
               />
               <Input
@@ -208,27 +254,30 @@ const RegistrationForm = () => {
                 type="time"
                 name="closingTime"
                 value={formData.closingTime}
+                disabled={isViewMode}
                 onChange={handleChange}
               />
             </div>
           </Section>
 
           {/* ACTIONS */}
-          <div className="flex justify-end gap-4 pt-6 border-t">
-            <button
-              type="reset"
-              className="px-6 py-2.5 rounded-xl bg-gray-100 text-gray-700"
-            >
-              Cancel
-            </button>
+          {!isViewMode && (
+            <div className="flex justify-end gap-4 pt-6 border-t">
+              <button
+                type="reset"
+                className="px-6 py-2.5 rounded-xl bg-gray-100 text-gray-700"
+              >
+                Cancel
+              </button>
 
-            <button
-              type="submit"
-              className="px-7 py-2.5 rounded-xl bg-[#540863] text-white shadow-lg hover:opacity-90"
-            >
-              Register Provider
-            </button>
-          </div>
+              <button
+                type="submit"
+                className="px-7 py-2.5 rounded-xl bg-[#540863] text-white shadow-lg hover:opacity-90"
+              >
+                Register Provider
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>
@@ -244,7 +293,7 @@ const Section = ({ title, children }) => (
   </section>
 );
 
-const Input = ({ label, name, value, onChange, type = "text" }) => (
+const Input = ({ label, name, value, onChange, type = "text", disabled }) => (
   <div>
     <label className="label">{label}</label>
     <input
@@ -252,12 +301,15 @@ const Input = ({ label, name, value, onChange, type = "text" }) => (
       value={value}
       onChange={onChange}
       type={type}
-      className="input-soft"
+      disabled={disabled}
+      className={`input-soft ${
+        disabled ? "bg-gray-100 cursor-not-allowed" : ""
+      }`}
     />
   </div>
 );
 
-const Textarea = ({ label, name, value, onChange }) => (
+const Textarea = ({ label, name, value, onChange, disabled }) => (
   <div>
     <label className="label">{label}</label>
     <textarea
@@ -265,19 +317,32 @@ const Textarea = ({ label, name, value, onChange }) => (
       name={name}
       value={value}
       onChange={onChange}
-      className="input-soft resize-none"
+      disabled={disabled}
+      className={`input-soft resize-none ${
+        disabled ? "bg-gray-100 cursor-not-allowed" : ""
+      }`}
     />
   </div>
 );
 
-const Select = ({ label, name, value, onChange, options }) => (
+const Select = ({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  disabled = false,
+}) => (
   <div>
     <label className="label">{label}</label>
     <select
       name={name}
       value={value}
       onChange={onChange}
-      className="input-soft"
+      disabled={disabled}
+      className={`input-soft ${
+        disabled ? "bg-gray-100 cursor-not-allowed" : ""
+      }`}
     >
       <option value="">Select</option>
       {options.map((opt) => (

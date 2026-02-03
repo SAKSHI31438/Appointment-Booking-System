@@ -4,6 +4,8 @@ import cors from "cors";
 import { connect } from "./config/db.js";
 import authRoutes from "./routes/auth-routes.js";
 import serviceProviderRoutes from "./routes/serviceProvider-routes.js";
+import serviceProviderAdminRoutes from "./routes/serviceProviderAdmin-routes.js";
+import categoryRoutes from "./routes/category-route.js";
 
 dotenv.config();
 connect();
@@ -13,6 +15,8 @@ app.use(cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/serviceProvider", serviceProviderRoutes);
+app.use("/api/serviceProviderAdmin", serviceProviderAdminRoutes);
+app.use("/api/category", categoryRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT} `);
