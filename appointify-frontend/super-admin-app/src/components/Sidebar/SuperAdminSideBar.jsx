@@ -5,6 +5,8 @@ import {
   Users,
   Settings,
   LogOut,
+  CopySlash,
+  CopySlashIcon,
 } from "lucide-react";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -33,6 +35,14 @@ const SuperAdminSideBar = () => {
         >
           <LayoutDashboard size={18} />
           <span className="text-sm">Provider Registration</span>
+        </Link>
+        <Link
+          to={"/category"}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition"
+        >
+          <CopySlashIcon size={18} />
+
+          <span className="text-sm">Category</span>
         </Link>
 
         <Link

@@ -9,6 +9,9 @@ const serviceProviderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  subCategory: {
+    type: [String],
+  },
   shortDescription: {
     type: String,
     required: true,
@@ -52,6 +55,11 @@ const serviceProviderSchema = new mongoose.Schema({
   },
   closingTime: {
     type: String,
+  },
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
   },
 });
 

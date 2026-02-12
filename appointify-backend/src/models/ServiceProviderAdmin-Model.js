@@ -36,6 +36,11 @@ const serviceProviderAdminSchema = new mongoose.Schema({
     required: true,
     maxLength: 12,
   },
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+  },
 });
 
 export default mongoose.model(

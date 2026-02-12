@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
     console.log("Phone:", phone);
     console.log("OTP:", otp);
-    alert("Login Successful");
+    toast.success("Login Successful");
     router("/");
   };
 

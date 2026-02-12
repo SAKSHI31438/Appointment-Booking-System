@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const RegistrationForm = () => {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -11,6 +12,7 @@ const RegistrationForm = () => {
   const [formData, setFormData] = useState({
     providerName: "",
     category: "",
+    subCategory: "",
     shortDescription: "",
     fullDescription: "",
     phoneNumber: "",
@@ -24,6 +26,23 @@ const RegistrationForm = () => {
     openingTime: "",
     closingTime: "",
   });
+  const [categories, setCategories] = useState([]);
+  const [openDropdown, setOpenDropdown] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/api/category/getAllActiveCategories",
+        );
+        setCategories(res.data.data || []);
+      } catch (error) {
+        console.error("Category fetch failed", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (
@@ -64,7 +83,7 @@ const RegistrationForm = () => {
         },
       );
 
-      alert("Provider registered successfully ✅");
+      toast.success("Provider registered successfully ✅");
 
       router("/home");
 
@@ -72,7 +91,7 @@ const RegistrationForm = () => {
     } catch (error) {
       console.error(error);
 
-      alert(error.response.data.message || "Validation error");
+      toast.error(error.response?.data?.message || "Validation error");
     }
   };
 
@@ -84,7 +103,7 @@ const RegistrationForm = () => {
         );
         setFormData(res.data.data);
       } catch (error) {
-        alert("Failed to load provider details");
+        toast.error("Failed to load provider details");
         console.error(error);
       }
     };
@@ -121,21 +140,69 @@ const RegistrationForm = () => {
                 onChange={handleChange}
               />
 
-              <Select
-                label="Category"
-                name="category"
-                value={formData.category}
-                disabled={isViewMode}
-                onChange={handleChange}
-                options={[
-                  "Hospital",
-                  "Clinic",
-                  "Salon",
-                  "Restaurant",
-                  "Lab",
-                  "Gym",
-                ]}
-              />
+              {/* CATEGORY + SUB CATEGORY */}
+              <div className="relative">
+                <label className="label">Category</label>
+
+                <button
+                  type="button"
+                  disabled={isViewMode}
+                  onClick={() => setOpenDropdown(!openDropdown)}
+                  className={`input-soft w-full text-left flex justify-between items-center ${
+                    isViewMode ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {formData.subCategory ||
+                    formData.category ||
+                    "Select Category"}
+                  <span>▾</span>
+                </button>
+
+                {openDropdown && !isViewMode && (
+                  <div className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-lg border">
+                    {categories.map((cat) => (
+                      <div key={cat._id} className="group relative">
+                        {/* CATEGORY */}
+                        <div
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              category: cat.category,
+                              subCategory: "",
+                            }));
+                            setOpenDropdown(false);
+                          }}
+                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer font-medium"
+                        >
+                          {cat.category}
+                        </div>
+
+                        {/* SUB CATEGORIES (LEFT SIDE) */}
+                        {cat.subCategories?.length > 0 && (
+                          <div className="absolute right-full top-0 hidden group-hover:block bg-white w-56 border shadow-lg rounded-xl">
+                            {cat.subCategories.map((sub) => (
+                              <div
+                                key={sub._id}
+                                onClick={() => {
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    category: cat.category,
+                                    subCategory: sub.name,
+                                  }));
+                                  setOpenDropdown(false);
+                                }}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                              >
+                                {sub.name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <Input
@@ -163,6 +230,8 @@ const RegistrationForm = () => {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 disabled={isViewMode}
+                minLength={10}
+                maxLength={10}
                 onChange={handleChange}
               />
               <Input
@@ -293,7 +362,16 @@ const Section = ({ title, children }) => (
   </section>
 );
 
-const Input = ({ label, name, value, onChange, type = "text", disabled }) => (
+const Input = ({
+  label,
+  name,
+  value,
+  onChange,
+  type = "text",
+  disabled,
+  minLength,
+  maxLength,
+}) => (
   <div>
     <label className="label">{label}</label>
     <input
@@ -302,6 +380,8 @@ const Input = ({ label, name, value, onChange, type = "text", disabled }) => (
       onChange={onChange}
       type={type}
       disabled={disabled}
+      minLength={minLength}
+      maxLength={maxLength}
       className={`input-soft ${
         disabled ? "bg-gray-100 cursor-not-allowed" : ""
       }`}

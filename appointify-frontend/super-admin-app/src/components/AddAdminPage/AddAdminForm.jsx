@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import SuperAdminSideBar from "../Sidebar/SuperAdminSideBar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AddAdminForm = () => {
   const [providers, setProviders] = useState([]);
@@ -51,7 +52,7 @@ const AddAdminForm = () => {
         },
       );
       console.log("FORM DATA ", formData);
-      alert("Admin Added successfully ✅");
+      toast.success("Admin Added successfully ✅");
 
       router("/admin");
 
@@ -59,7 +60,7 @@ const AddAdminForm = () => {
     } catch (error) {
       console.error(error);
 
-      alert(error.response.data.message || "Validation error");
+      toast.error(error.response.data.message || "Validation error");
     }
   };
 
@@ -73,7 +74,7 @@ const AddAdminForm = () => {
         setProviders(res.data.data || []);
       } catch (error) {
         console.error(error);
-        alert("Failed to fetch service providers");
+        toast.error("Failed to fetch service providers");
         setProviders([]);
       }
     };
@@ -95,7 +96,7 @@ const AddAdminForm = () => {
           role: data.role ? data.role.toUpperCase() : "ADMIN",
         });
       } catch (error) {
-        alert("Failed to load admin details");
+        toast.error("Failed to load admin details");
         console.error(error);
       }
     };

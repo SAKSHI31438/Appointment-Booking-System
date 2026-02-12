@@ -127,3 +127,71 @@ export const getServiceProviderAdminById = async (req, res) => {
     });
   }
 };
+
+export const editAdmin = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ message: " Admin Id is required" });
+  }
+  const {
+    fullName,
+    provider,
+    dob,
+    role,
+    email,
+    contactNumber,
+    address,
+    aadharNumber,
+  } = req.body;
+
+  try {
+    const updatedAdmin = await ServiceProviderAdminModel.findByIdAndUpdate(id, {
+      fullName,
+      provider,
+      dob,
+      role,
+      email,
+      contactNumber,
+      address,
+      aadharNumber,
+    });
+    if (!updatedAdmin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+    return res.json({
+      message: "Admin details Updated",
+      data: updatedAdmin,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: " Error" });
+  }
+};
+
+export const toggleAdminStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const admin = await ServiceProviderAdminModel.findById(id);
+
+    if (!admin) {
+      return res.status(404).json({
+        message: "Admin not found",
+      });
+    }
+
+    admin.status = admin.status === "active" ? "inactive" : "active";
+
+    await admin.save();
+
+    return res.json({
+      message: "Status updated successfully",
+      status: admin.status,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
