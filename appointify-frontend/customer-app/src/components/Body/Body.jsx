@@ -10,7 +10,7 @@ const Body = () => {
     <div className="bg-[#FFD3D5]">
       <HeroSection />
       <CategoriesCardSection />
-      <TopHospitals />
+      {/* <TopHospitals /> */}
       <HowItWorks />
       <Review />
     </div>

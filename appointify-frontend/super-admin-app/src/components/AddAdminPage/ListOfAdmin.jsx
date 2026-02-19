@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, PencilLine, Trash2 } from "lucide-react";
+import { Eye, PencilLine, Plus, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 const ListOfAdmin = () => {
@@ -86,21 +86,21 @@ const ListOfAdmin = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
-      <div className="mb-6 flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-gray-800">Admin</h1>
           <p className="text-sm text-gray-500">
             Manage all registered service providers Admins
           </p>
         </div>
-        <div>
-          <Link
-            to={"/add-admin"}
-            className="px-8 py-3 bg-[#540863] text-white font-semibold rounded-lg shadow hover:bg-[#390644] transition"
-          >
-            Add Admin
-          </Link>
-        </div>
+
+        <Link
+          to={"/add-admin"}
+          className="inline-flex items-center gap-2 px-4 py-3 bg-[#540863] text-white font-semibold rounded-lg shadow hover:bg-[#390644] transition"
+        >
+          <Plus size={18} />
+          Add Admin
+        </Link>
       </div>
 
       {/* Filters */}

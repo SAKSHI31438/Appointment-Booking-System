@@ -6,6 +6,9 @@ import AboutUsPage from "./components/AboutUs/AboutUsPage";
 import ContactUsPage from "./components/ContactUs/ContactUsPage";
 import ServicePage from "./components/Services/ServicePage";
 import Login from "./components/Login/Login";
+import SignUp from "./components/Login/SignUp";
+import { ToastContainer } from "react-toastify";
+import ProviderDetailsPage from "./components/Services/ProviderDetailsPage";
 
 function App() {
   return (
@@ -17,7 +20,10 @@ function App() {
           <Route path="/contact" element={<ContactUsPage />}></Route>
           <Route path="/services" element={<ServicePage />}></Route>
           <Route path="/login" element={<Login />}></Route>
+          <Route path="/signup" element={<SignUp />}></Route>
+          <Route path="/provider/:id" element={<ProviderDetailsPage />}></Route>
         </Routes>
+        <ToastContainer />
       </div>
     </>
   );

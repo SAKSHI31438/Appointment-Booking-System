@@ -7,12 +7,19 @@ import {
   IoReorderThreeOutline,
 } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const { pathname } = useLocation();
   const isHome = pathname === "/";
   const [navBg, setNavBg] = useState(!isHome);
   const [nav, setNav] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    return !!(token && user);
+  });
+
   const navOpen = nav ? "translate-y-0" : "translate-y-[-100%]";
 
   const handleNav = () => {
@@ -29,6 +36,16 @@ const Navbar = () => {
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, [isHome]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setIsLoggedIn(false);
+
+    window.location.href = "/"; // optional redirect
+    toast.success("Logout Successful ✅");
+  };
 
   return (
     <>
@@ -69,13 +86,21 @@ const Navbar = () => {
             ))}
           </div>
 
-          <NavLink
-            to={"/login"}
-            className={`hidden md:inline-flex px-6 py-2 border border-white text-white font-semibold rounded-lg hover:border-[#540863]  hover:text-[#540863] transition
-         `}
-          >
-            Login / Signup
-          </NavLink>
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="hidden md:inline-flex px-6 py-2 border border-white text-white font-semibold rounded-lg hover:border-[#540863] hover:text-[#540863] transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <NavLink
+              to={"/login"}
+              className="hidden md:inline-flex px-6 py-2 border border-white text-white font-semibold rounded-lg hover:border-[#540863] hover:text-[#540863] transition"
+            >
+              Login / Signup
+            </NavLink>
+          )}
 
           <div className="flex   lg:hidden">
             {nav == false ? (
@@ -128,12 +153,21 @@ const Navbar = () => {
             >
               FAQ
             </Link>
-            <Link
-              to={"/login"}
-              className="p-1 mx-auto w-full   py-3 flex text-center items-center justify-center"
-            >
-              Login/SignUp
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                onClick={handleLogout}
+                className="flex md:inline-flex p-1 mx-auto w-full py-3 text-center items-center justify-center"
+              >
+                Logout
+              </Link>
+            ) : (
+              <NavLink
+                to={"/login"}
+                className="flex md:inline-flex p-1 mx-auto w-full py-3 text-center items-center justify-center"
+              >
+                Login / Signup
+              </NavLink>
+            )}
           </div>
         </div>
       )}

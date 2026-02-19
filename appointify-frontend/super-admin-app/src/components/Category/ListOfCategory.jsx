@@ -76,7 +76,7 @@ const ListOfCategory = () => {
 
         <Link
           to="/add-category"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#540863] text-white rounded-lg shadow hover:bg-[#390644]"
+          className="inline-flex items-center gap-2 px-4 py-3 bg-[#540863] text-white rounded-lg shadow hover:bg-[#390644]"
         >
           <Plus size={18} />
           Add Category
